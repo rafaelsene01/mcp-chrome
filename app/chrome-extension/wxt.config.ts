@@ -44,6 +44,7 @@ export default defineConfig({
     permissions: [
       'nativeMessaging',
       'tabs',
+      'tabGroups',
       'activeTab',
       'scripting',
       'contextMenus',
@@ -138,6 +139,9 @@ export default defineConfig({
       // Ensure static assets are available as early as possible to avoid race conditions in dev
       // Copy workers/_locales/inject-scripts into the build output before other steps
       viteStaticCopy({
+        // WXT runs several vite builds into the same outDir; re-copying (overwrite) in each one
+        // races with WXT stat-ing the output on Windows (ENOENT). The outDir is cleaned at build
+        // start, so in production the first copy is enough. Dev keeps overwrite for live reload.
         targets: [
           {
             src: 'inject-scripts/*.js',
@@ -151,7 +155,7 @@ export default defineConfig({
             src: '_locales/**/*',
             dest: '_locales',
           },
-        ],
+        ].map((t) => ({ ...t, overwrite: env.command !== 'build' })),
         // Use writeBundle so outDir exists for dev and prod
         hook: 'writeBundle',
         // Enable watch so changes to these files are reflected during dev

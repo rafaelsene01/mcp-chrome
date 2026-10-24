@@ -68,134 +68,10 @@
           </div>
         </div>
 
-        <!-- 快捷工具卡片 -->
-        <div class="section">
-          <h2 class="section-title">Ferramentas rápidas</h2>
-          <div class="rr-icon-buttons">
-            <button
-              class="rr-icon-btn rr-icon-btn-record rr-icon-btn-coming-soon has-tooltip"
-              @click="startRecording"
-              data-tooltip="Gravação em desenvolvimento"
-            >
-              <RecordIcon :recording="false" />
-            </button>
-            <button
-              class="rr-icon-btn rr-icon-btn-stop rr-icon-btn-coming-soon has-tooltip"
-              @click="stopRecording"
-              data-tooltip="Gravação em desenvolvimento"
-            >
-              <StopIcon />
-            </button>
-            <button
-              class="rr-icon-btn rr-icon-btn-edit has-tooltip"
-              @click="toggleWebEditor"
-              data-tooltip="Ativar modo de edição da página"
-            >
-              <EditIcon />
-            </button>
-            <button
-              class="rr-icon-btn rr-icon-btn-marker has-tooltip"
-              @click="toggleElementMarker"
-              data-tooltip="Ativar marcação de elementos"
-            >
-              <MarkerIcon />
-            </button>
-          </div>
-        </div>
-
         <!-- 管理入口卡片 -->
         <div class="section">
           <h2 class="section-title">Gerenciamento</h2>
           <div class="entry-card">
-            <button class="entry-item" @click="openAgentSidepanel">
-              <div class="entry-icon agent">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </div>
-              <div class="entry-content">
-                <span class="entry-title">Assistente IA</span>
-                <span class="entry-desc">Conversas e tarefas com o agente de IA</span>
-              </div>
-              <svg
-                class="entry-arrow"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button class="entry-item entry-item-coming-soon" @click="openWorkflowSidepanel">
-              <div class="entry-icon workflow">
-                <WorkflowIcon />
-              </div>
-              <div class="entry-content">
-                <span class="entry-title">
-                  Gerenciamento de Fluxos
-                  <span class="coming-soon-badge">Coming Soon</span>
-                </span>
-                <span class="entry-desc">Gravar e reproduzir fluxos de automação</span>
-              </div>
-              <svg
-                class="entry-arrow"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button class="entry-item" @click="openElementMarkerSidepanel">
-              <div class="entry-icon marker">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
-              </div>
-              <div class="entry-content">
-                <span class="entry-title">Gerenciador de marcações</span>
-                <span class="entry-desc">Gerenciar marcações de elementos da página</span>
-              </div>
-              <svg
-                class="entry-arrow"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
             <button class="entry-item" @click="currentView = 'local-model'">
               <div class="entry-icon model">
                 <svg
@@ -312,22 +188,6 @@
 
     <!-- 侧边栏承担工作流管理；编辑器在独立窗口中打开 -->
 
-    <!-- Coming Soon Toast -->
-    <Transition name="toast">
-      <div v-if="comingSoonToast.show" class="coming-soon-toast">
-        <svg
-          class="toast-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>{{ comingSoonToast.feature }} em desenvolvimento, aguarde novidades</span>
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -358,12 +218,7 @@ import {
   CheckIcon,
   TabIcon,
   VectorIcon,
-  RecordIcon,
-  StopIcon,
-  WorkflowIcon,
   RefreshIcon,
-  EditIcon,
-  MarkerIcon,
 } from './components/icons';
 
 // AgentChat theme - 从preload中获取，保持与sidepanel一致
@@ -371,146 +226,6 @@ const { theme: agentTheme, initTheme } = useAgentTheme();
 
 // 当前视图状态：首页 or 本地模型页
 const currentView = ref<'home' | 'local-model'>('home');
-
-// Coming Soon Toast
-const comingSoonToast = ref<{ show: boolean; feature: string }>({ show: false, feature: '' });
-
-function showComingSoonToast(feature: string) {
-  comingSoonToast.value = { show: true, feature };
-  setTimeout(() => {
-    comingSoonToast.value = { show: false, feature: '' };
-  }, 2000);
-}
-
-// Record & Replay state
-const rrRecording = ref(false);
-const rrFlows = ref<
-  Array<{ id: string; name: string; description?: string; meta?: any; variables?: any[] }>
->([]);
-const rrOnlyBound = ref(false);
-const rrSearch = ref('');
-const currentTabUrl = ref<string>('');
-const filteredRrFlows = computed(() => {
-  const base = rrOnlyBound.value ? rrFlows.value.filter(isFlowBoundToCurrent) : rrFlows.value;
-  const q = rrSearch.value.trim().toLowerCase();
-  if (!q) return base;
-  return base.filter((f: any) => {
-    const name = String(f.name || '').toLowerCase();
-    const domain = String(f?.meta?.domain || '').toLowerCase();
-    const tags = ((f?.meta?.tags || []) as any[]).join(',').toLowerCase();
-    return name.includes(q) || domain.includes(q) || tags.includes(q);
-  });
-});
-
-// Flow editor在独立窗口中打开；在popup不再展示繁杂列表
-
-const loadFlows = async () => {
-  try {
-    const res = await chrome.runtime.sendMessage({ type: BACKGROUND_MESSAGE_TYPES.RR_LIST_FLOWS });
-    if (res && res.success) rrFlows.value = res.flows || [];
-  } catch (e) {
-    /* ignore */
-  }
-};
-
-function isFlowBoundToCurrent(flow: any) {
-  try {
-    const bindings = flow?.meta?.bindings || [];
-    if (!bindings.length) return false;
-    if (!currentTabUrl.value) return true;
-    const url = new URL(currentTabUrl.value);
-    return bindings.some((b: any) => {
-      if (b.type === 'domain') return url.hostname.includes(b.value);
-      if (b.type === 'path') return url.pathname.startsWith(b.value);
-      if (b.type === 'url') return (url.href || '').startsWith(b.value);
-      return false;
-    });
-  } catch {
-    return false;
-  }
-}
-
-// 运行记录与覆盖项在侧边栏页面查看
-const startRecording = async () => {
-  // TODO: 录制回放功能开发中，暂时拦截
-  showComingSoonToast('Gravação e reprodução');
-  return;
-  // if (rrRecording.value) return;
-  // try {
-  //   const res = await chrome.runtime.sendMessage({
-  //     type: BACKGROUND_MESSAGE_TYPES.RR_START_RECORDING,
-  //     meta: { name: '新录制' },
-  //   });
-  //   rrRecording.value = !!(res && res.success);
-  // } catch (e) {
-  //   console.error('开始录制失败:', e);
-  //   rrRecording.value = false;
-  // }
-};
-
-const stopRecording = async () => {
-  // TODO: 录制回放功能开发中，暂时拦截
-  showComingSoonToast('Gravação e reprodução');
-  return;
-  // if (!rrRecording.value) return;
-  // try {
-  //   const res = await chrome.runtime.sendMessage({
-  //     type: BACKGROUND_MESSAGE_TYPES.RR_STOP_RECORDING,
-  //   });
-  //   rrRecording.value = false;
-  //   if (res && res.success) await loadFlows();
-  // } catch (e) {
-  //   console.error('停止录制失败:', e);
-  //   rrRecording.value = false;
-  // }
-};
-
-const runFlow = async (flowId: string) => {
-  try {
-    // load flow to get runOptions
-    let flow: any = null;
-    try {
-      const getRes = await chrome.runtime.sendMessage({
-        type: BACKGROUND_MESSAGE_TYPES.RR_GET_FLOW,
-        flowId,
-      });
-      if (getRes && getRes.success) flow = getRes.flow;
-    } catch {}
-    const runOptions = (flow && flow.meta && flow.meta.runOptions) || {};
-    // No per-run overrides in popup; sidepanel/editor manage advanced options
-    const ov: any = {};
-    const res = await chrome.runtime.sendMessage({
-      type: BACKGROUND_MESSAGE_TYPES.RR_RUN_FLOW,
-      flowId,
-      options: { ...runOptions, ...ov, returnLogs: true },
-    });
-    if (!(res && res.success)) {
-      console.warn('Falha na reprodução');
-      return;
-    }
-    // If failed, open builder and focus the failed node
-    try {
-      const result = res.result;
-      if (result && result.success === false) {
-        const logs = result.logs || [];
-        const failed = logs.find((l: any) => l.status === 'failed');
-        if (failed && failed.stepId) {
-          // 打开独立编辑窗口并定位失败节点
-          if (flow) openBuilderWindow(flow.id, String(failed.stepId));
-        }
-      } else if (result && result.success === true) {
-        // If run succeeded but selector fallback was used, suggest updating priorities
-        const logs = result.logs || [];
-        const fb = logs.find((l: any) => l.fallbackUsed && l.fallbackTo);
-        if (fb && flow) openBuilderWindow(flow.id, String(fb.stepId || ''));
-      }
-    } catch {}
-  } catch (e) {
-    console.error('Falha na reprodução:', e);
-  }
-};
-
-// 旧的“克隆/发布/定时/覆盖项”在侧边栏或编辑器中处理
 
 const nativeConnectionStatus = ref<'unknown' | 'connected' | 'disconnected'>('unknown');
 const isConnecting = ref(false);
@@ -612,70 +327,6 @@ const getStatusClass = () => {
   }
 };
 
-// Open sidepanel and close popup
-async function openSidepanelAndClose(tab: string) {
-  try {
-    const current = await chrome.windows.getCurrent();
-    if ((chrome.sidePanel as any)?.setOptions) {
-      await (chrome.sidePanel as any).setOptions({
-        path: `sidepanel.html?tab=${tab}`,
-        enabled: true,
-      });
-    }
-    if (chrome.sidePanel && (chrome.sidePanel as any).open) {
-      await (chrome.sidePanel as any).open({ windowId: current.id! });
-    }
-    // Close popup after opening sidepanel
-    window.close();
-  } catch (e) {
-    console.warn(`Failed to open sidepanel (${tab}):`, e);
-  }
-}
-
-// Open sidepanel from popup for workflow management
-function openWorkflowSidepanel() {
-  // TODO: 工作流功能开发中，暂时拦截
-  showComingSoonToast('Gerenciamento de Fluxos');
-  // openSidepanelAndClose('workflows');
-}
-
-// Open sidepanel for element marker management
-function openElementMarkerSidepanel() {
-  openSidepanelAndClose('element-markers');
-}
-
-// Open sidepanel for agent chat
-function openAgentSidepanel() {
-  openSidepanelAndClose('agent-chat');
-}
-
-async function toggleWebEditor() {
-  try {
-    await chrome.runtime.sendMessage({ type: BACKGROUND_MESSAGE_TYPES.WEB_EDITOR_TOGGLE });
-  } catch (error) {
-    console.warn('Falha ao alternar o modo de edição da página:', error);
-  }
-}
-
-async function toggleElementMarker() {
-  try {
-    // 获取当前活动tab
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) {
-      console.warn('Não foi possível obter a aba atual');
-      return;
-    }
-
-    // 向background发送消息，启动元素标注
-    await chrome.runtime.sendMessage({
-      type: BACKGROUND_MESSAGE_TYPES.ELEMENT_MARKER_START,
-      tabId: tab.id,
-    });
-  } catch (error) {
-    console.warn('Falha ao ativar a marcação de elementos:', error);
-  }
-}
-
 async function openWelcomePage() {
   try {
     await chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
@@ -690,13 +341,6 @@ async function openTroubleshooting() {
   } catch {
     // ignore
   }
-}
-
-function openBuilderWindow(flowId?: string, focusNodeId?: string) {
-  const url = new URL(chrome.runtime.getURL('builder.html'));
-  if (flowId) url.searchParams.set('flowId', flowId);
-  if (focusNodeId) url.searchParams.set('focus', focusNodeId);
-  chrome.windows.create({ url: url.toString(), type: 'popup', width: 1280, height: 800 });
 }
 
 const getStatusText = () => {
@@ -1502,10 +1146,6 @@ const setupServerStatusListener = () => {
       serverStatus.value = message.payload as any;
       console.log('Server status updated:', message.payload);
     }
-    // Flows changed - refresh list (IndexedDB-based notification)
-    if (message.type === BACKGROUND_MESSAGE_TYPES.RR_FLOWS_CHANGED) {
-      loadFlows();
-    }
   };
   chrome.runtime.onMessage.addListener(onMessage);
   // Store reference for cleanup
@@ -1521,25 +1161,9 @@ onMounted(async () => {
   await checkServerStatus();
   await refreshStorageStats();
   await loadCacheStats();
-  await loadFlows();
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    currentTabUrl.value = tab?.url || '';
-  } catch {}
 
   await checkSemanticEngineStatus();
   setupServerStatusListener();
-  // Auto-refresh workflows list when storage rr_flows changes
-  try {
-    const onChanged = (changes: any, area: string) => {
-      try {
-        if (area !== 'local') return;
-        if (Object.prototype.hasOwnProperty.call(changes || {}, 'rr_flows')) loadFlows();
-      } catch {}
-    };
-    chrome.storage.onChanged.addListener(onChanged);
-    (window as any).__rr_popup_onChanged = onChanged;
-  } catch {}
 });
 
 onUnmounted(() => {
@@ -1550,13 +1174,6 @@ onUnmounted(() => {
     const msgFn = (window as any).__rr_popup_onMessage;
     if (msgFn && chrome?.runtime?.onMessage?.removeListener) {
       chrome.runtime.onMessage.removeListener(msgFn);
-    }
-  } catch {}
-  // Clean up storage change listener (legacy fallback)
-  try {
-    const fn = (window as any).__rr_popup_onChanged;
-    if (fn && chrome?.storage?.onChanged?.removeListener) {
-      chrome.storage.onChanged.removeListener(fn);
     }
   } catch {}
 });
@@ -2359,168 +1976,6 @@ onUnmounted(() => {
   }
 }
 
-/* 快捷工具icon按钮样式 */
-.rr-icon-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-start;
-  padding: 16px;
-  background: var(--ac-surface, white);
-  border-radius: var(--ac-radius-card, 12px);
-  box-shadow: var(--ac-shadow-card, 0 1px 3px rgba(0, 0, 0, 0.08));
-}
-
-.rr-icon-btn {
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--ac-surface-muted, #f2f0eb);
-  border: none;
-  border-radius: var(--ac-radius-button, 8px);
-  color: var(--ac-text-muted, #6e6e6e);
-  cursor: pointer;
-  transition: all var(--ac-motion-fast, 120ms) ease;
-}
-
-.rr-icon-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--ac-shadow-float, 0 4px 20px -2px rgba(0, 0, 0, 0.05));
-}
-
-.rr-icon-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.rr-icon-btn svg {
-  width: 24px;
-  height: 24px;
-}
-
-/* 录制按钮 - 红色 */
-.rr-icon-btn-record {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.rr-icon-btn-record:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.2);
-  color: #dc2626;
-}
-
-/* 录制中状态 - 脉冲动画 */
-.rr-icon-btn-recording {
-  animation: pulse-recording 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-recording {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-  }
-}
-
-/* 停止按钮 - 深红色 */
-.rr-icon-btn-stop {
-  background: rgba(185, 28, 28, 0.1);
-  color: #b91c1c;
-}
-
-.rr-icon-btn-stop:hover:not(:disabled) {
-  background: rgba(185, 28, 28, 0.2);
-  color: #991b1b;
-}
-
-/* 编辑按钮 - 蓝色 */
-.rr-icon-btn-edit {
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
-}
-
-.rr-icon-btn-edit:hover:not(:disabled) {
-  background: rgba(37, 99, 235, 0.2);
-  color: #1d4ed8;
-}
-
-/* 标注按钮 - 绿色 */
-.rr-icon-btn-marker {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
-
-.rr-icon-btn-marker:hover:not(:disabled) {
-  background: rgba(16, 185, 129, 0.2);
-  color: #059669;
-}
-
-/* Coming Soon 按钮样式 */
-.rr-icon-btn-coming-soon {
-  opacity: 0.5;
-  cursor: default !important;
-}
-
-.rr-icon-btn-coming-soon:hover {
-  transform: none !important;
-  box-shadow: none !important;
-  opacity: 0.6;
-}
-
-/* CSS Tooltip - instant display */
-.has-tooltip {
-  position: relative;
-}
-
-.has-tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.3;
-  white-space: nowrap;
-  color: var(--ac-text-inverse, #ffffff);
-  background-color: var(--ac-text, #1a1a1a);
-  border-radius: var(--ac-radius-button, 8px);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 80ms ease,
-    visibility 80ms ease;
-  pointer-events: none;
-  z-index: 100;
-}
-
-.has-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: calc(100% + 2px);
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-top-color: var(--ac-text, #1a1a1a);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 80ms ease,
-    visibility 80ms ease;
-  pointer-events: none;
-  z-index: 100;
-}
-
-.has-tooltip:hover::after,
-.has-tooltip:hover::before {
-  opacity: 1;
-  visibility: visible;
-}
-
 /* 首页视图 */
 .home-view {
   display: flex;
@@ -2568,21 +2023,6 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.entry-icon.agent {
-  background: rgba(217, 119, 87, 0.12);
-  color: var(--ac-accent, #d97757);
-}
-
-.entry-icon.workflow {
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
-}
-
-.entry-icon.marker {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-}
-
 .entry-icon.model {
   background: rgba(139, 92, 246, 0.12);
   color: #8b5cf6;
@@ -2614,66 +2054,4 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-/* Coming Soon Badge */
-.coming-soon-badge {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 6px;
-  padding: 2px 6px;
-  font-size: 9px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--ac-accent, #d97757);
-  background: rgba(217, 119, 87, 0.12);
-  border-radius: 4px;
-  vertical-align: middle;
-}
-
-.entry-item-coming-soon {
-  opacity: 0.7;
-}
-
-.entry-item-coming-soon:hover {
-  opacity: 0.85;
-}
-
-/* Coming Soon Toast */
-.coming-soon-toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: var(--ac-text, #1a1a1a);
-  color: var(--ac-text-inverse, #ffffff);
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: var(--ac-radius-card, 12px);
-  box-shadow: var(--ac-shadow-float, 0 4px 20px -2px rgba(0, 0, 0, 0.15));
-  z-index: 1000;
-  white-space: nowrap;
-}
-
-.toast-icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  color: var(--ac-accent, #d97757);
-}
-
-/* Toast transition */
-.toast-enter-active,
-.toast-leave-active {
-  transition: all 0.25s ease;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translateX(-50%) translateY(12px);
-}
 </style>
