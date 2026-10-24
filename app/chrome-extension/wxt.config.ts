@@ -10,7 +10,11 @@ import IconsResolver from 'unplugin-icons/resolver';
 config({ path: resolve(process.cwd(), '.env') });
 config({ path: resolve(process.cwd(), '.env.local') });
 
-const CHROME_EXTENSION_KEY = process.env.CHROME_EXTENSION_KEY;
+// Same key as the official release, so the unpacked build keeps the extension ID
+// (hbdgbgagpkpjffpklnamcljpakneikee) allowed by the native host manifest.
+const DEFAULT_EXTENSION_KEY =
+  'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDDnB4a6/wwEIEnMqhd64+OblTmF0KlqvHkZJnYN7vdOLElFOzjZbl2dA4tQERDfiY5M0qTkp+1QnYGkS2sAAUYg9v8k0BQjKHM0JSZQaV+QjukglUDiNzsgcSw0Yek/KF0mFVtuKS72EpBI5krEJ8N/b6SVTfg+3arG4SeY6Bww2bEhcFusDv8w2FJnWHpnnIFGch02/NON4aDWPSZJfF1AxMBtXSHDaEaN+mEffwyflBEl9fjlYrJe8PJxAytgWkOwJErJXFHKxgONE84W5UgYWomEJHkFolxTLvBdPtryPp6ZWbwZUBR4mBuH2luo4L+JAlF17uDASzAs0qCEMwzAgMBAAECggEAS9LsaIspSohbSBJ+6UkycIecKUTC9Oz6rwnACOwxymL7Z+BgoxT/e0cpZ6kNzQvNTUbwlZu0hNKqZYlJJu8rCoGyeImr2I1q+rWvpGip+fM6o15SDfiziooS8GeIKRA0lbmnA80bLiV9QxrFeMgMn6PIh3i5HGDdcx5LngoIWyz122vrIMUAynkUlgWRuESOvBded1N2TzsJoyMwYPdFSBK7fY4hKehU/SuSHetiXDieS0RBWj+wOaoEJRaZFCiVrGPMV5BcKWMtgs9WkYG/AMFVYgXDNDgcfLy0ExckIvonY05nh/x50Np+EzZR65K56kpqJjIB6yZMacjevYOhQQKBgQDjJrkVTHM4Qd0fpL7AtJnRpQpr/fE+0vWpMvB+VkqoAEwKdLyymejy2lOuxfqUCkHY4IcITwTyw4A6hibfZ1zHnBc3yCJwcKCvZXuJZaQTvd6xGZSHf9JHcwkDtDZ1VYzrzV8gKV12GzaqQRmyagS0/fuITTfhG8bKSbv/0I4NeQKBgQDcc+alUI02hjJ9T1AkMQt9LeUXjMjzQVH6rVn0qts5Vs5LvgLOqdpnK5xTeomxM0qCPCy9Da6EqV7/5sFuybvj8oFvrxEnhEcGH/Iy2XH3yUtROGOkOsvEqkoo/6C5LUSehclCzZnFABb7z915utlbrNZFEQJyZTXf3Sz6QPH4CwKBgH2ke5eWU9z4QXExVPmOa86UNXGKYxhW498U+AVJgb3vfCAEdiNsEnfR35u6kmG0Uru9ZbNo0dnd3V2Bupqzt5QJeKY4IySCh768qVpUSC9LRJQ9C/Tu9MbkkEXmNoEsMuhzDnzhpHqhjtkZbTdMgRIDsk+wNopjLM/TfROArjIxAoGBAMGksSHfWttdD7aQ16WiyyO/D7AbA1zhsMAQS6cl+YEpZfaURmUAQA9F+IA/b/mOQ1GYx/ecsAJpwD/qk1jcrUVyfA39aoUapUSVBStzY6+zSoxiiuv0lY7/wjq3KJfgUpkojXw3m223QXkZwsKtxUXI0UJDybFwg91Lq7l7GNC3AoGARTBSr83TTKIkcHsnH9Wl7ZVgS44iRXvTe/7pLgwzPLVAWwBiOZFF7yDqIxZlSTUh9f+MWGCMmMqfm8SDom91G0L8KoQP1PMKrbspRCG65M1VJlecwSXG0MhxdUZ3l5vT0i/aYDP6hBcc57Q2iHHOtJTRk/va1l8uH/1JOUVj9gs=';
+const CHROME_EXTENSION_KEY = process.env.CHROME_EXTENSION_KEY || DEFAULT_EXTENSION_KEY;
 // Detect dev mode early for manifest-level switches
 const IS_DEV = process.env.NODE_ENV !== 'production' && process.env.MODE !== 'production';
 
@@ -34,7 +38,7 @@ export default defineConfig({
   manifest: {
     // Use environment variable for the key, fallback to undefined if not set
     key: CHROME_EXTENSION_KEY,
-    default_locale: 'zh_CN',
+    default_locale: 'pt_BR',
     name: '__MSG_extensionName__',
     description: '__MSG_extensionDescription__',
     permissions: [

@@ -1,31 +1,31 @@
 <template>
   <div class="form-section">
     <div class="form-group">
-      <label class="form-label">Tab ID（可选）</label>
+      <label class="form-label">Tab ID (opcional)</label>
       <input
         class="form-input"
         type="number"
         v-model.number="(node as any).config.tabId"
-        placeholder="数字"
+        placeholder="Número"
       />
     </div>
     <div class="form-group" :class="{ invalid: needOne && !hasAny }">
-      <label class="form-label">URL 包含（可选）</label>
-      <input class="form-input" v-model="(node as any).config.urlContains" placeholder="子串匹配" />
+      <label class="form-label">URL contém (opcional)</label>
+      <input class="form-input" v-model="(node as any).config.urlContains" placeholder="Trecho do texto" />
     </div>
     <div class="form-group" :class="{ invalid: needOne && !hasAny }">
-      <label class="form-label">标题包含（可选）</label>
+      <label class="form-label">Título contém (opcional)</label>
       <input
         class="form-input"
         v-model="(node as any).config.titleContains"
-        placeholder="子串匹配"
+        placeholder="Trecho do texto"
       />
     </div>
     <div
       v-if="needOne && !hasAny"
       class="text-xs text-slate-500"
       style="padding: 0 20px; color: var(--rr-danger)"
-      >需提供 tabId 或 URL/标题包含</div
+      >É necessário informar tabId ou trecho de URL/título</div
     >
   </div>
 </template>

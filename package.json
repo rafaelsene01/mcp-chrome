@@ -4,6 +4,9 @@
   "private": true,
   "author": "hangye",
   "type": "module",
+  "engines": {
+    "pnpm": ">=8 <9"
+  },
   "scripts": {
     "build:shared": "pnpm --filter chrome-mcp-shared build",
     "build:native": "pnpm --filter mcp-chrome-bridge build",

@@ -1,13 +1,9 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { setupTools } from './register-tools';
 
-export let mcpServer: Server | null = null;
-
+// A Server instance accepts only one transport, so each connection needs its own.
 export const getMcpServer = () => {
-  if (mcpServer) {
-    return mcpServer;
-  }
-  mcpServer = new Server(
+  const mcpServer = new Server(
     {
       name: 'ChromeMcpServer',
       version: '1.0.0',
