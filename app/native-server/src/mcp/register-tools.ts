@@ -73,11 +73,25 @@ export const setupTools = (server: Server) => {
     return { tools: [...TOOL_SCHEMAS, ...dynamicTools] };
   });
 
-  // Call tool handler
-  server.setRequestHandler(CallToolRequestSchema, async (request) =>
-    handleToolCall(request.params.name, request.params.arguments || {}),
-  );
+  // Call tool handler. Small local models often loop on an identical call;
+  // flag the repeat so they move on (one server instance per connection).
+  let lastCallKey = '';
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const { name, arguments: args = {} } = request.params;
+    const callKey = `${name}:${JSON.stringify(args)}`;
+    const isRepeat = callKey === lastCallKey;
+    lastCallKey = callKey;
+
+    const result = await handleToolCall(name, args);
+    if (isRepeat) {
+      result.content = [...(result.content ?? []), { type: 'text', text: REPEATED_CALL_NOTE }];
+    }
+    return result;
+  });
 };
+
+const REPEATED_CALL_NOTE =
+  'Note: this call is identical to your previous one. If the result already answers the task, stop calling tools and reply to the user now; otherwise change the arguments or use another tool.';
 
 const handleToolCall = async (name: string, args: any): Promise<CallToolResult> => {
   try {

@@ -443,6 +443,8 @@ export function connectNativeHost(port: number = NATIVE_HOST.DEFAULT_PORT): bool
 
       // Mark server as stopped since native host disconnection means server is down
       void markServerStopped('native_port_disconnected');
+      // MCP is gone: drop any proxy set by chrome_proxy so browsing goes direct again
+      void chrome.proxy.settings.clear({ scope: 'regular' }).catch(() => {});
 
       // Handle reconnection based on disconnect reason
       if (manualDisconnect) {
@@ -482,6 +484,8 @@ export const initNativeHostListener = () => {
 
   // Auto-connect on Chrome browser startup
   chrome.runtime.onStartup.addListener(() => {
+    // A proxy set by chrome_proxy must not outlive the session that set it
+    void chrome.proxy.settings.clear({ scope: 'regular' }).catch(() => {});
     void ensureNativeConnected('onStartup').catch(() => {});
   });
 

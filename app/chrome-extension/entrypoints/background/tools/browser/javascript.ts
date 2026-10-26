@@ -70,6 +70,7 @@ interface JavaScriptToolResult {
   tabId: number;
   engine: ExecutionEngine;
   result?: string;
+  logs?: string;
   truncated?: boolean;
   redacted?: boolean;
   warnings?: string[];
@@ -87,6 +88,8 @@ type ExecutionSuccess = {
   ok: true;
   engine: ExecutionEngine;
   output: string;
+  logs?: string;
+  isEmpty: boolean;
   truncated: boolean;
   redacted: boolean;
 };
@@ -145,11 +148,69 @@ function isDebuggerConflictError(error: unknown): boolean {
   );
 }
 
+// Pages where Chrome refuses script injection (CDP and chrome.scripting alike)
+const RESTRICTED_URL_RE = /^(chrome|chrome-extension|chrome-untrusted|devtools|edge|view-source):/i;
+
+const CAPTURED_CONSOLE_METHODS = ['log', 'info', 'warn', 'error', 'debug'];
+
+const EMPTY_RESULT_HINT =
+  'Code returned undefined and logged nothing. Use "return <value>" to get data back, and "await" async work (e.g. "return await test();" instead of "test();").';
+
 /**
- * Wrap user code in an async IIFE to support top-level await and return statements.
+ * Build an async function body that runs user code, captures console output
+ * and returns { value, logs }. Supports top-level await and return statements.
  */
-function wrapUserCode(code: string): string {
-  return `(async () => {\n${code}\n})()`;
+function buildInstrumentedBody(code: string): string {
+  return `
+const __mcpLogs = [];
+const __mcpConsole = {};
+for (const m of ${JSON.stringify(CAPTURED_CONSOLE_METHODS)}) {
+  __mcpConsole[m] = console[m];
+  console[m] = (...args) => {
+    try {
+      __mcpLogs.push((m === 'log' ? '' : '[' + m + '] ') + args.map((a) => {
+        if (typeof a === 'string') return a;
+        try { return JSON.stringify(a) ?? String(a); } catch { return String(a); }
+      }).join(' '));
+    } catch {}
+    return __mcpConsole[m].apply(console, args);
+  };
+}
+try {
+  const value = await (async () => {
+${code}
+  })();
+  return { value, logs: __mcpLogs };
+} finally {
+  Object.assign(console, __mcpConsole);
+}`;
+}
+
+function unpackInstrumented(raw: unknown): { value: unknown; logs: string[] } {
+  const obj = (raw ?? {}) as { value?: unknown; logs?: unknown };
+  return { value: obj.value, logs: Array.isArray(obj.logs) ? obj.logs.map(String) : [] };
+}
+
+function toSuccess(
+  engine: ExecutionEngine,
+  raw: unknown,
+  options: ExecutionOptions,
+): ExecutionSuccess {
+  const { value, logs } = unpackInstrumented(raw);
+  const sanitized = sanitizeAndLimitOutput(value, { maxBytes: options.maxOutputBytes });
+  const sanitizedLogs = logs.length
+    ? sanitizeAndLimitOutput(logs.join('\n'), { maxBytes: options.maxOutputBytes })
+    : undefined;
+
+  return {
+    ok: true,
+    engine,
+    output: sanitized.text,
+    logs: sanitizedLogs?.text,
+    isEmpty: value === undefined && !logs.length,
+    truncated: sanitized.truncated || !!sanitizedLogs?.truncated,
+    redacted: sanitized.redacted || !!sanitizedLogs?.redacted,
+  };
 }
 
 // ============================================================================
@@ -224,7 +285,7 @@ async function executeViaCdp(
   options: ExecutionOptions,
 ): Promise<ExecutionResult> {
   try {
-    const expression = wrapUserCode(code);
+    const expression = `(async () => {${buildInstrumentedBody(code)}\n})()`;
 
     const response = await withTimeout(
       cdpSessionManager.withSession(tabId, CDP_SESSION_KEY, async () => {
@@ -249,17 +310,7 @@ async function executeViaCdp(
       };
     }
 
-    // Extract and sanitize the result
-    const value = extractReturnValue(response?.result);
-    const sanitized = sanitizeAndLimitOutput(value, { maxBytes: options.maxOutputBytes });
-
-    return {
-      ok: true,
-      engine: 'cdp',
-      output: sanitized.text,
-      truncated: sanitized.truncated,
-      redacted: sanitized.redacted,
-    };
+    return toSuccess('cdp', extractReturnValue(response?.result), options);
   } catch (error) {
     if (isTimeoutError(error)) {
       return {
@@ -330,7 +381,7 @@ async function executeViaScripting(
           };
         }
       },
-      args: [code],
+      args: [buildInstrumentedBody(code)],
     });
 
     // Extract the first result
@@ -364,16 +415,7 @@ async function executeViaScripting(
       };
     }
 
-    // Sanitize the successful result
-    const sanitized = sanitizeAndLimitOutput(result.value, { maxBytes: options.maxOutputBytes });
-
-    return {
-      ok: true,
-      engine: 'scripting',
-      output: sanitized.text,
-      truncated: sanitized.truncated,
-      redacted: sanitized.redacted,
-    };
+    return toSuccess('scripting', result.value, options);
   };
 
   try {
@@ -425,6 +467,12 @@ class JavaScriptTool extends BaseBrowserToolExecutor {
         return createErrorResponse('Tab has no ID');
       }
       const tabId = tab.id;
+
+      if (tab.url && RESTRICTED_URL_RE.test(tab.url)) {
+        return createErrorResponse(
+          `Tab ${tabId} shows "${tab.url}", where Chrome blocks scripts. Do not retry the same call and do not ask the user to open a tab. Next step: call ${TOOL_NAMES.BROWSER.NAVIGATE} with the http(s) URL you need (e.g. {"url":"https://example.com"}); it opens a new tab and returns its tabId. Then call ${TOOL_NAMES.BROWSER.JAVASCRIPT} again with that tabId.`,
+        );
+      }
 
       // Normalize options
       const options: ExecutionOptions = {
@@ -481,16 +529,18 @@ class JavaScriptTool extends BaseBrowserToolExecutor {
     tabId: number,
     result: ExecutionSuccess,
     startTime: number,
-    warnings?: string[],
+    warnings: string[] = [],
   ): ToolResult {
+    const allWarnings = result.isEmpty ? [...warnings, EMPTY_RESULT_HINT] : warnings;
     const payload: JavaScriptToolResult = {
       success: true,
       tabId,
       engine: result.engine,
       result: result.output,
+      logs: result.logs,
       truncated: result.truncated || undefined,
       redacted: result.redacted || undefined,
-      warnings: warnings?.length ? warnings : undefined,
+      warnings: allWarnings.length ? allWarnings : undefined,
       metrics: { elapsedMs: Math.round(performance.now() - startTime) },
     };
 

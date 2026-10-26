@@ -9,7 +9,7 @@ import {
   ListResourcesRequestSchema,
   ListPromptsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { TOOL_SCHEMAS } from 'chrome-mcp-shared';
+import { SERVER_INSTRUCTIONS, TOOL_SCHEMAS } from 'chrome-mcp-shared';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import * as fs from 'fs';
@@ -45,6 +45,7 @@ export const getStdioMcpServer = () => {
         resources: {},
         prompts: {},
       },
+      instructions: SERVER_INSTRUCTIONS,
     },
   );
 

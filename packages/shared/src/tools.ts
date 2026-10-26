@@ -47,10 +47,20 @@ export const TOOL_NAMES = {
   },
 };
 
+// Sent to MCP clients on initialize so the model knows when and how to use this server
+export const SERVER_INSTRUCTIONS = `These tools control the user's real Chrome browser (their tabs, logins and cookies) through the Chrome MCP extension.
+Use them whenever a task involves the web or the browser: opening or reading a website, searching online, logging in, filling forms, clicking, extracting data, taking screenshots, debugging a page (console, network, JavaScript) or changing browser settings such as the proxy.
+Workflow:
+1. Never ask the user to open a tab or page. Call ${TOOL_NAMES.BROWSER.NAVIGATE} with the URL yourself; without tabId it opens a new tab and returns its tabId.
+2. Read the page with ${TOOL_NAMES.BROWSER.READ_PAGE} or ${TOOL_NAMES.BROWSER.WEB_FETCHER}; act with ${TOOL_NAMES.BROWSER.CLICK}, ${TOOL_NAMES.BROWSER.FILL} or ${TOOL_NAMES.BROWSER.COMPUTER}.
+3. Scripts (${TOOL_NAMES.BROWSER.JAVASCRIPT}) only run on http(s) pages. If the active tab is chrome://, a new tab page or an extension page, call ${TOOL_NAMES.BROWSER.NAVIGATE} first and pass the returned tabId.
+4. Never repeat a call with the same arguments after it returned an error or an empty result; follow the hint in the result, change the arguments or use another tool.`;
+
 export const TOOL_SCHEMAS: Tool[] = [
   {
     name: TOOL_NAMES.BROWSER.GET_WINDOWS_AND_TABS,
-    description: 'Get all currently open browser windows and tabs',
+    description:
+      "Get all currently open windows and tabs (tabId, url, title) in the user's Chrome browser. Use it to find a tabId to target; to open a site, call chrome_navigate instead of asking the user.",
     inputSchema: {
       type: 'object',
       properties: {},
@@ -398,7 +408,7 @@ export const TOOL_SCHEMAS: Tool[] = [
   {
     name: TOOL_NAMES.BROWSER.NAVIGATE,
     description:
-      'Navigate to a URL, refresh the current tab, or navigate browser history (back/forward)',
+      "Open a URL in the user's Chrome browser, refresh the current tab, or navigate history (back/forward). Without tabId it opens a new tab (or reuses one already on that URL) and returns its tabId. Call it yourself whenever a task needs a website, instead of asking the user to open a page, and before page tools when the active tab is chrome:// or a new tab page.",
     inputSchema: {
       type: 'object',
       properties: {
@@ -838,14 +848,14 @@ export const TOOL_SCHEMAS: Tool[] = [
   {
     name: TOOL_NAMES.BROWSER.JAVASCRIPT,
     description:
-      'Execute JavaScript code in a browser tab and return the result. Uses CDP Runtime.evaluate with awaitPromise and returnByValue; automatically falls back to chrome.scripting.executeScript if the debugger is busy. Output is sanitized (sensitive data redacted) and truncated by default.',
+      'Execute JavaScript in a web page (page context, like the DevTools console) and return the result plus captured console output. Use it to debug a page or extract data from it. Only works on http(s) pages: if the active tab is chrome://, a new tab page or an extension page, first call chrome_navigate with the URL you need and pass the returned tabId. Browser APIs such as chrome.proxy are not available here (use chrome_proxy). Output is sanitized (sensitive data redacted) and truncated by default.',
     inputSchema: {
       type: 'object',
       properties: {
         code: {
           type: 'string',
           description:
-            'JavaScript code to execute. Runs inside an async function body, so top-level await and "return ..." are supported.',
+            'JavaScript code to execute. Runs inside an async function body, so top-level await and "return ..." are supported. Only the returned value and console output produced before the code finishes are captured: always "return" the data you need and "await" async work (e.g. "return await fetch(url).then(r => r.text())").',
         },
         tabId: {
           type: 'number',
@@ -1199,7 +1209,7 @@ export const TOOL_SCHEMAS: Tool[] = [
   {
     name: TOOL_NAMES.BROWSER.PROXY,
     description:
-      'Set or clear the browser proxy (chrome.proxy). Applies to the whole browser, not a single tab. Use "set" before navigating through a proxy and "clear" to go back to a direct connection.',
+      'Set or clear the browser proxy (chrome.proxy). Applies to the whole browser, not a single tab. Use "set" before navigating through a proxy and "clear" to go back to a direct connection. Always "clear" when the proxied task is done; the proxy is also cleared automatically when the MCP server disconnects or the browser restarts.',
     inputSchema: {
       type: 'object',
       properties: {
