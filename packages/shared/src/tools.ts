@@ -33,6 +33,7 @@ export const TOOL_NAMES = {
     READ_PAGE: 'chrome_read_page',
     COMPUTER: 'chrome_computer',
     HANDLE_DIALOG: 'chrome_handle_dialog',
+    PROXY: 'chrome_proxy',
     HANDLE_DOWNLOAD: 'chrome_handle_download',
     USERSCRIPT: 'chrome_userscript',
     PERFORMANCE_START_TRACE: 'performance_start_trace',
@@ -1190,6 +1191,30 @@ export const TOOL_SCHEMAS: Tool[] = [
         promptText: {
           type: 'string',
           description: 'Optional prompt text when accepting a prompt',
+        },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: TOOL_NAMES.BROWSER.PROXY,
+    description:
+      'Set or clear the browser proxy (chrome.proxy). Applies to the whole browser, not a single tab. Use "set" before navigating through a proxy and "clear" to go back to a direct connection.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['set', 'clear'], description: 'set | clear' },
+        scheme: {
+          type: 'string',
+          enum: ['http', 'https', 'socks4', 'socks5'],
+          description: 'Proxy scheme (default: http). Used with "set".',
+        },
+        host: { type: 'string', description: 'Proxy host. Required for "set".' },
+        port: { type: 'number', description: 'Proxy port. Required for "set".' },
+        bypassList: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Hosts that skip the proxy (default: ["<local>"]). Used with "set".',
         },
       },
       required: ['action'],

@@ -58,6 +58,7 @@ export default defineConfig({
       'storage',
       'declarativeNetRequest',
       'alarms',
+      'proxy',
       // Allow programmatic control of Chrome Side Panel
       'sidePanel',
     ],

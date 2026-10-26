@@ -20,6 +20,7 @@ export { fileUploadTool } from './file-upload';
 export { readPageTool } from './read-page';
 export { computerTool } from './computer';
 export { handleDialogTool } from './dialog';
+export { proxyTool } from './proxy';
 export { handleDownloadTool } from './download';
 export { userscriptTool } from './userscript';
 export {
